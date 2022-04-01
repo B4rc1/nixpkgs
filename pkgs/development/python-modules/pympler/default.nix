@@ -1,6 +1,8 @@
 { lib, stdenv
 , buildPythonPackage
 , fetchPypi
+, pythonAtLeast
+, pytestCheckHook
 }:
 
 buildPythonPackage rec {
@@ -12,9 +14,15 @@ buildPythonPackage rec {
     sha256 = "993f1a3599ca3f4fcd7160c7545ad06310c9e12f70174ae7ae8d4e25f6c5d3fa";
   };
 
-  postPatch = ''
-   rm test/asizeof/test_asizeof.py
-  '';
+  checkInputs = [
+    pytestCheckHook
+  ];
+
+  disabledTests = [
+    # 'AssertionError: 'function (test.muppy.test_summary.func)' != 'function (muppy.test_summary.func)'
+    # https://github.com/pympler/pympler/issues/134
+    "test_repr_function"
+  ];
 
   doCheck = stdenv.hostPlatform.isLinux;
 
